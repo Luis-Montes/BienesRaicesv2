@@ -1,7 +1,6 @@
 <?php
-// variable que indica que estamos en el inicio para añadir la clase en el header
-$inicio = true;
-include 'includes/templates/header.php';
+require 'includes/funciones.php';
+incluirTemplate('header', $inicio = true);
 ?>
 
     <main class="contenedor seccion">
@@ -201,18 +200,9 @@ include 'includes/templates/header.php';
         </section>
     </div>
 
-    <footer class="footer seccion">
-        <div class="contenedor contenedor-footer">
-            <nav class="navegacion">
-                <a href="nosotros.php">Nosotros</a>
-                <a href="anuncios.php">Anuncios</a>
-                <a href="blog.php">Blog</a>
-                <a href="contacto.php">Contacto</a>
-            </nav>
-        </div>
-
-        <p class="copyright">Todos los derechos Reservados 2021 &copy;</p>
-    </footer>
+    <?php
+    incluirTemplate('footer');
+    ?>
 
     <script src="build/js/bundle.min.js"></script>
 </body>
