@@ -26,11 +26,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $titulo = mysqli_real_escape_string( $db, $_POST['titulo']);
     $precio = mysqli_real_escape_string( $db, $_POST['precio']);
-    $descripcion = mysqli_real_escape_string( $db, $_POST['descripc)ion']);
-    $habitaciones = mysqli_real_escape_string( $db, $_POST['habitaci)ones']);
+    $descripcion = mysqli_real_escape_string( $db, $_POST['descripcion']);
+    $habitaciones = mysqli_real_escape_string( $db, $_POST['habitaciones']);
     $wc = mysqli_real_escape_string( $db, $_POST['wc']);
-    $estacionamiento = mysqli_real_escape_string( $db, $_POST['estacion)amiento']);
-    $vendedor_id = mysqli_real_escape_string( $db, $_POST['vendedor)_id']);
+    $estacionamiento = mysqli_real_escape_string( $db, $_POST['estacionamiento']);
+    $vendedor_id = mysqli_real_escape_string( $db, $_POST['vendedor_id']);
     $creado = date('Y/m/d');
 
     //Asignar files a una variable
@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Validar el tamaño de la imagen
-    $medida = 1000 * 100;
+    $medida = 1000 * 1000;
 
     if ($imagen['size'] > $medida) {
         $errores[] = 'La imagen es muy pesada';
@@ -77,13 +77,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     //Revisar que el arreglo de errores este vacio
     if (empty($errores)) {
-        $query = " INSERT INTO propiedades (titulo, precio, descripcion, habitaciones, wc, estacionamiento, creado, vendedor_id) 
-        VALUES ('$titulo', '$precio', '$descripcion', '$habitaciones', '$wc', '$estacionamiento', '$creado', '$vendedor_id') ";
+        //Guardar las imagenes
+
+        //Crear carpeta
+        $carpetaImagenes = '../../imagenes/';
+        if (!is_dir($carpetaImagenes)) {
+            mkdir($carpetaImagenes);
+        }
+
+        //Generar nombre unico
+        $nombreImagen = md5(uniqid(rand(), true));
+
+        //Subir imagen
+        move_uploaded_file($imagen['tmp_name'], $carpetaImagenes . $nombreImagen . ".jpg");
+
+
+        $query = " INSERT INTO propiedades (titulo, precio, imagen, descripcion, habitaciones, wc, estacionamiento, creado, vendedor_id) 
+        VALUES ('$titulo', '$precio', '$nombreImagen', '$descripcion', '$habitaciones', '$wc', '$estacionamiento', '$creado', '$vendedor_id') ";
 
         $resultado = mysqli_query($db, $query);
 
         if ($resultado) {
-            header('Location: /admin');
+            header('Location: /admin?resultado=1');
         }
     }
 }
@@ -109,7 +124,7 @@ incluirTemplate('header');
             <legend>Información General</legend>
 
             <label for="titulo">Título:</label>
-            <input type="text" id="titulo" name="titulo" placeholder="Título Propiedad" value="<?php $titulo ?>">
+            <input type="text" id="titulo" name="titulo" placeholder="Título Propiedad" value="<?php echo $titulo ?>">
 
             <label for="precio">Precio:</label>
             <input type="number" id="precio" name="precio" placeholder="Precio Propiedad" value="<?php echo $precio ?>">
@@ -118,7 +133,7 @@ incluirTemplate('header');
             <input type="file" id="imagen" name="imagen" accept="image/jpeg, image/png">
 
             <label for="descripcion">Descripción:</label>
-            <textarea name="descripcion" id="descripcion" value="<?php $descripcion ?>"></textarea>
+            <textarea name="descripcion" id="descripcion"><?php echo $descripcion ?></textarea>
 
         </fieldset>
 
