@@ -90,20 +90,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errores)) {
         //Guardar las imagenes
 
-        //Crear carpeta
         $carpetaImagenes = '../../imagenes/';
         if (!is_dir($carpetaImagenes)) {
             mkdir($carpetaImagenes);
         }
 
-        //Generar nombre unico
-        $nombreImagen = md5(uniqid(rand(), true));
+        $nombreImagen = '';
 
-        //Subir imagen
-        move_uploaded_file($imagen['tmp_name'], $carpetaImagenes . $nombreImagen . ".jpg");
+        //Eliminar la imagen anteriro
+        if ($imagen['name']) {
+            unlink($carpetaImagenes . $propiedad['imagen']);
+
+            $nombreImagen = md5(uniqid(rand(), true)) . ".jpg";
+
+            move_uploaded_file($imagen['tmp_name'], $carpetaImagenes . $nombreImagen);
+        } else {
+            $nombreImagen = $propiedad['imagen'];
+        }
 
 
-        $query = " UPDATE propiedades SET titulo = '$titulo', precio = '$precio', descripcion = '$descripcion', habitaciones = $habitaciones,
+        $query = " UPDATE propiedades SET titulo = '$titulo', precio = '$precio', imagen = '$nombreImagen', descripcion = '$descripcion', habitaciones = $habitaciones,
         wc = $wc, estacionamiento = $estacionamiento, vendedor_id = $vendedor_id WHERE id = $id ";
 
         $resultado = mysqli_query($db, $query);
@@ -143,7 +149,7 @@ incluirTemplate('header');
             <label for="imagen">Imagen:</label>
             <input type="file" id="imagen" name="imagen" accept="image/jpeg, image/png">
 
-            <img src="/imagenes/<?php echo $imagenPropiedad . ".jpg"; ?>" alt="y a foto?" class="imagen-small">
+            <img src="/imagenes/<?php echo $imagenPropiedad; ?>" alt="y a foto?" class="imagen-small">
 
             <label for="descripcion">Descripción:</label>
             <textarea name="descripcion" id="descripcion"><?php echo $descripcion ?></textarea>

@@ -81,15 +81,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         //Crear carpeta
         $carpetaImagenes = '../../imagenes/';
+
         if (!is_dir($carpetaImagenes)) {
             mkdir($carpetaImagenes);
         }
 
         //Generar nombre unico
-        $nombreImagen = md5(uniqid(rand(), true));
+        $nombreImagen = md5(uniqid(rand(), true)) . ".jpg";
 
         //Subir imagen
-        move_uploaded_file($imagen['tmp_name'], $carpetaImagenes . $nombreImagen . ".jpg");
+        move_uploaded_file($imagen['tmp_name'], $carpetaImagenes . $nombreImagen);
 
 
         $query = " INSERT INTO propiedades (titulo, precio, imagen, descripcion, habitaciones, wc, estacionamiento, creado, vendedor_id) 
